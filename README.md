@@ -8,8 +8,8 @@ HOW TO USE
 
     ezserve [-addr <address>] [-root <directory>]
 
-`-addr`: Address to bind (default to `:10080`)
-`-root`: Directory to serve (relative to current, default to `.`)
+* `-addr`: Address to bind (default to `:10080`)
+* `-root`: Directory to serve (relative to current, default to `.`)
 
 INSTALL
 -------
