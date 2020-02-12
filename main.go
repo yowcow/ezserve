@@ -17,8 +17,6 @@ func init() {
 
 func main() {
 	log.Println("serving static files under", root, "at address", addr)
-
 	fs := http.FileServer(http.Dir(root))
-
 	log.Fatalln(http.ListenAndServe(addr, fs))
 }
