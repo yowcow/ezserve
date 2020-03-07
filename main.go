@@ -4,6 +4,9 @@ import (
 	"flag"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/yowcow/ezserve/logging"
 )
 
 var addr string
@@ -16,7 +19,9 @@ func init() {
 }
 
 func main() {
-	log.Println("serving static files under", root, "at address", addr)
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	logger.Println("serving static files under", root, "at address", addr)
+
 	fs := http.FileServer(http.Dir(root))
-	log.Fatalln(http.ListenAndServe(addr, fs))
+	log.Fatalln(http.ListenAndServe(addr, logging.NewHandler(fs, logger)))
 }
