@@ -42,6 +42,15 @@ func NewHandler(h http.Handler, l *log.Logger) *Handler {
 func (l *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	resp := newResponseWriter(w)
 	l.handler.ServeHTTP(resp, req)
-	l.logger.Printf(`%s %s %s %s %d "%s" "%s"`, req.RemoteAddr, req.Method, req.RequestURI, req.Proto, resp.statusCode, req.Referer(), req.UserAgent())
+	l.logger.Printf(
+		`%s %s %s %s %d "%s" "%s"`,
+		req.RemoteAddr,
+		req.Method,
+		req.RequestURI,
+		req.Proto,
+		resp.statusCode,
+		req.Referer(),
+		req.UserAgent(),
+	)
 	return
 }
