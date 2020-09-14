@@ -15,7 +15,10 @@ type LoggingHandler struct {
 }
 
 // NewHandler creates and returns a logging handler
-func NewLoggingHandler(logger *log.Logger) *LoggingHandler {
+func NewLoggingHandler(enable bool, logger *log.Logger) http.Handler {
+	if !enable {
+		return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {})
+	}
 	return &LoggingHandler{logger}
 }
 

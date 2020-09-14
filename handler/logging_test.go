@@ -26,7 +26,7 @@ func TestLogging(t *testing.T) {
 				fmt.Fprint(w, "404 Not Found")
 			}
 		}),
-		NewLoggingHandler(log.New(&buf, "", 0)),
+		NewLoggingHandler(true, log.New(&buf, "", 0)),
 	}
 
 	ts := httptest.NewServer(NewMiddleware(handlers))

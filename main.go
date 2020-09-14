@@ -33,9 +33,7 @@ func main() {
 	handlers := []http.Handler{
 		handler.NewCORSHandler(opt.allowOrigin),
 		http.FileServer(http.Dir(opt.root)),
-	}
-	if !opt.quiet {
-		handlers = append(handlers, handler.NewLoggingHandler(logger))
+		handler.NewLoggingHandler(!opt.quiet, logger),
 	}
 
 	log.Fatal(http.ListenAndServe(opt.addr, handler.NewMiddleware(handlers)))
