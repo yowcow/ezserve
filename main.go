@@ -6,29 +6,37 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/yowcow/ezserve/logging"
+	"github.com/yowcow/ezserve/handler"
 )
 
-var addr string
-var root string
-var quiet bool
+type Options struct {
+	addr        string
+	allowOrigin string
+	root        string
+	quiet       bool
+}
+
+var opt Options
 
 func init() {
-	flag.StringVar(&addr, "addr", ":10080", "address to bind")
-	flag.StringVar(&root, "root", ".", "root directory")
-	flag.BoolVar(&quiet, "quiet", false, "quiet output")
+	flag.StringVar(&opt.addr, "addr", ":10080", "address to bind")
+	flag.StringVar(&opt.allowOrigin, "allow-origin", "", "access-control-allow-origin")
+	flag.StringVar(&opt.root, "root", ".", "root directory")
+	flag.BoolVar(&opt.quiet, "quiet", false, "quiet output")
 	flag.Parse()
 }
 
 func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
-	logger.Println("serving static files under", root, "at address", addr)
+	logger.Println("serving static files under", opt.root, "at address", opt.addr)
 
-	fs := http.FileServer(http.Dir(root))
-
-	if quiet {
-		log.Fatalln(http.ListenAndServe(addr, fs))
-	} else {
-		log.Fatalln(http.ListenAndServe(addr, logging.NewHandler(fs, logger)))
+	handlers := []http.Handler{
+		handler.NewCORSHandler(opt.allowOrigin),
+		http.FileServer(http.Dir(opt.root)),
 	}
+	if !opt.quiet {
+		handlers = append(handlers, handler.NewLoggingHandler(logger))
+	}
+
+	log.Fatal(http.ListenAndServe(opt.addr, handler.NewMiddleware(handlers)))
 }

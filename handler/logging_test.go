@@ -1,4 +1,4 @@
-package logging
+package handler
 
 import (
 	"bytes"
@@ -13,21 +13,23 @@ import (
 
 func TestLogging(t *testing.T) {
 	var buf bytes.Buffer
-	logger := log.New(&buf, "", 0)
-	h := NewHandler(http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		switch req.RequestURI {
-		case "/200":
-			fmt.Fprint(w, "200 OK")
-		case "/500":
-			w.WriteHeader(http.StatusInternalServerError)
-			fmt.Fprint(w, "500 Internal Server Error")
-		default:
-			w.WriteHeader(http.StatusNotFound)
-			fmt.Fprint(w, "404 Not Found")
-		}
-	}), logger)
+	handlers := []http.Handler{
+		http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+			switch req.RequestURI {
+			case "/200":
+				fmt.Fprint(w, "200 OK")
+			case "/500":
+				w.WriteHeader(http.StatusInternalServerError)
+				fmt.Fprint(w, "500 Internal Server Error")
+			default:
+				w.WriteHeader(http.StatusNotFound)
+				fmt.Fprint(w, "404 Not Found")
+			}
+		}),
+		NewLoggingHandler(log.New(&buf, "", 0)),
+	}
 
-	ts := httptest.NewServer(h)
+	ts := httptest.NewServer(NewMiddleware(handlers))
 	defer ts.Close()
 
 	cases := []struct {
