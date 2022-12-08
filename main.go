@@ -14,7 +14,7 @@ var addr string
 var root string
 var cert string
 var key string
-var allowOrigin bool
+var allowCORS bool
 var quiet bool
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 	flag.StringVar(&root, "root", ".", "root directory")
 	flag.StringVar(&cert, "cert", "", "certificate file")
 	flag.StringVar(&key, "key", "", "key file")
-	flag.BoolVar(&allowOrigin, "allow-origin", false, "cors allow-origin")
+	flag.BoolVar(&allowCORS, "allow-cors", false, "allow CORS policy")
 	flag.BoolVar(&quiet, "quiet", false, "quiet output")
 	flag.Parse()
 }
@@ -33,8 +33,8 @@ func main() {
 
 	handler := http.FileServer(http.Dir(root))
 
-	if allowOrigin {
-		handler = cors.NewHandler(handler, allowOrigin)
+	if allowCORS {
+		handler = cors.NewHandler(handler, allowCORS)
 	}
 
 	if !quiet {
